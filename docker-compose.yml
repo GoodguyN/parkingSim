@@ -1,0 +1,79 @@
+version: '3.2'
+
+services: 
+
+  odsupercomponent:
+    image: seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+    container_name: odsupercomponent
+    network_mode: host
+    ipc: host
+    volumes:
+      - type: bind
+        source: /home/$USER/Desktop/ParkingSim/config
+        target: /opt/data
+    working_dir: /opt/data
+    command: "/opt/od4/bin/odsupercomponent --cid=111 --freq=10 --verbose=1"
+
+  odsimvehicle:
+    image: seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+    container_name: odsimvehicle
+    depends_on: 
+      - odsupercomponent
+    network_mode: host
+    ipc: host
+    volumes:
+      - type: bind
+        source: /home/$USER/Desktop/ParkingSim/config
+        target: /opt/data
+    working_dir: /opt/data
+    command: "/opt/od4/bin/odsimvehicle --cid=111 --verbose=0 --freq=10"
+
+  odsimirus:
+    image: seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+    container_name: odsimirus
+    network_mode: host
+    ipc: host
+    depends_on: 
+      - odsupercomponent
+    volumes:
+      - type: bind
+        source: /home/$USER/Desktop/ParkingSim/config
+        target: /opt/data
+    working_dir: /opt/data
+    command: "/opt/od4/bin/odsimirus --cid=111 --verbose=0 --freq=10"
+
+  odcockpit:
+    image: seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+    container_name: odcockpit
+    network_mode: host
+    ipc: host
+    depends_on: 
+      - odsupercomponent
+    volumes:
+      - type: bind
+        source: /home/$USER/Desktop/ParkingSim/config
+        target: /opt/data
+      - type: bind
+        source: ./tmp/.X11-unix
+        target: /tmp/.X11-unix
+    working_dir: /opt/data
+    environment:
+      - DISPLAY=$DISPLAY
+      - QT_X11_NO_MITSHM=1
+    command: "/opt/od4/bin/odcockpit --cid=111 --verbose=0 --freq=10"
+
+  boxparker:
+    image: seresearch/scaledcars-on-opendlv-on-opendlv-core-on-opendavinci-on-base-dev:latest
+    container_name: boxparker
+    network_mode: host
+    ipc: host
+    depends_on:
+      - odsupercomponent
+      - odsimirus
+      - odsimvehicle
+    volumes:
+      - type: bind
+        source: /home/$USER/Desktop/ParkingSim/config
+        target: /opt/data
+    working_dir: /opt/data
+    command: "/opt/opendlv.scaledcars/bin/miniature/boxparker --cid=111 --verbose=1 --freq=10"

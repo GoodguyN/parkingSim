@@ -1,0 +1,10 @@
+1) problems building the entirety of OpenDaVinci from the repository using docker. -> forked opendlv.scaledcars alternative.
+2) setup makefiles to include new module which is a direct copy from the original repo (/automotive/miniature/control/boxparker)
+3) created docker-compose file in order to start the rest of the modules in separate services/containers and added a service running our boxparker module.
+4) studied the model vehicle. Setting the speed to 0 still does not force the model into a full stop, therefore there is some kind of measurable deceleration.
+creating a sample test case to see the surplus of distance traveled after setting the speed to zero, helps us determining a valuable offset for our stages of maneuvres
+5) determined the model of the vehicle needed for parking algorithm, by tracing the total traveled distance when doing the parking maneuver.
+the parking maneuver requires a tracing of a quadrant. we measure the distance traveled when executing the quadrant, which is an arc of 90 degrees. this gives us the
+radius of the circle and also any other arc length (using the same steering angle)
+6) added a functionality of reading a configuration file for values such as steering angle, distance traveled that is required for each stage etc
+7) practising the U turn. for the model vehicle used, no matter how much fine tuning, it seemed impossible to make it trace a perfect 90  degree arc. it would either overshoot or understeer which means it wasnt possible to make the vehicle rotate by exactly 180 degrees. possibly with the help of a lanefollower we could make it straighten fully. otherwise use of sensors can be made, with the front right sensor to make sure we are steering away from the sideways obstacles but not oversteering at the same time
